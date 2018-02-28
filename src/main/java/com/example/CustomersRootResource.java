@@ -1,7 +1,10 @@
 package com.example;
 
+import sun.security.provider.certpath.OCSPResponse;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,13 +41,19 @@ public class CustomersRootResource {
   @GET
   @Path("/{pk: \\d+}")
   @Produces(MediaType.TEXT_PLAIN)
-  public String getCustByPk(@PathParam("pk") int id) {
+  public Response getCustByPk(@PathParam("pk") int id) {
+    Response.ResponseBuilder builder = Response.ok();
     String custInfo = MY_TABLE.get(id);
     String headerInfo = "header info is " + s1 + " " + s2;
     if (custInfo != null) {
-      return custInfo + headerInfo;
+      builder.entity(custInfo + headerInfo);
+      builder.header("Simon-Was-Here","Ouch");
     } else {
-      return "Er, who? I don't know customer id " + id + headerInfo;
+      builder.entity("Er, who? I don't know customer id " + id + headerInfo);
+      builder.status(Response.Status.NOT_FOUND);
+      builder.header("Simon-Was-Here","Huh");
     }
+
+    return builder.build();
   }
 }
